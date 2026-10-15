@@ -14,6 +14,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 * Document the weather API provider and exact configuration steps.
 
 
+## [1.1.1] 2026-10-15
+
+### Fixed
+* Replace unsupported `useAnimatedValue` hook with a stable `Animated.Value` and selected the JavaScript animation driver for web.
+
+[Full Changelog](https://github.com/knors22/my-weather-app/compare/v1.1.0...v1.1.1)
+
+
 ## [1.1.0] 2026-10-15
 
 ### Added

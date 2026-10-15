@@ -2,7 +2,7 @@
   "expo": {
     "name": "weather-mobile-app",
     "slug": "weather-mobile-app",
-    "version": "1.1.0",
+    "version": "1.1.1",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "weathermobileapp",

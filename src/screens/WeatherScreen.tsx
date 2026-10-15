@@ -14,7 +14,6 @@ import {
   Text,
   TextInput,
   View,
-  useAnimatedValue,
   useWindowDimensions,
   type StyleProp,
   type ViewStyle,
@@ -34,7 +33,7 @@ function FadeIn({ children, style, delay = 0 }: {
   delay?: number;
 }) {
   // Start visible while checking the device's reduced-motion preference.
-  const progress = useAnimatedValue(1);
+  const [progress] = useState(() => new Animated.Value(1));
 
   useEffect(() => {
     let active = true;
@@ -43,7 +42,7 @@ function FadeIn({ children, style, delay = 0 }: {
       if (!active || reduceMotion) return;
       progress.setValue(0);
       animation = Animated.timing(progress, {
-        toValue: 1, duration: 300, delay, useNativeDriver: true,
+        toValue: 1, duration: 300, delay, useNativeDriver: Platform.OS !== "web",
       });
       animation.start();
     }).catch(() => { /* Keep content visible if the preference cannot be read. */ });
