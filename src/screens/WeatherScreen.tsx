@@ -4,7 +4,6 @@ import {
   ActivityIndicator,
   Animated,
   Image,
-  Keyboard,
   KeyboardAvoidingView,
   Linking,
   Platform,
@@ -15,7 +14,6 @@ import {
   Text,
   TextInput,
   View,
-  useColorScheme,
   useAnimatedValue,
   useWindowDimensions,
   type StyleProp,
@@ -23,41 +21,12 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { createWeatherStyles, weatherThemes } from "../styles/weatherStyles";
+import LocationMap from "../components/LocationMap";
+import { useWeather } from "../hooks/useWeather";
+import { useWeatherTheme } from "../hooks/useWeatherTheme";
+import { selectForecastDays } from "../utils/forecast";
 
-type Units = "metric" | "imperial";
 type WeatherStyles = ReturnType<typeof createWeatherStyles>;
-
-// Display data is supplied by a future integration; no API or utilities are
-// imported here during the interface-only migration.
-export type WeatherDisplay = {
-  location: string;
-  localDateTime: string;
-  description: string;
-  iconUrl?: string;
-  temperature: number;
-  feelsLike: number;
-  humidity: number;
-  windSpeed: number;
-  pressure: number;
-  visibilityKm: number;
-  units: Units;
-};
-
-export type ForecastDisplay = {
-  date: string;
-  label: string;
-  description: string;
-  iconUrl?: string;
-  high: number;
-  low: number;
-};
-
-type WeatherScreenProps = {
-  weather?: WeatherDisplay | null;
-  forecast?: readonly ForecastDisplay[];
-  loading?: boolean;
-  error?: string;
-};
 
 function FadeIn({ children, style, delay = 0 }: {
   children: ReactNode;
@@ -136,59 +105,27 @@ function WeatherDetail({ icon, label, value, styles }: {
   );
 }
 
-export default function WeatherScreen({
-  weather = null, forecast = [], loading = false, error = "",
-}: WeatherScreenProps) {
-  const systemTheme = useColorScheme();
+export default function WeatherScreen() {
   const { width } = useWindowDimensions();
-  const [themeOverride, setThemeOverride] = useState<boolean | null>(null);
-  const isDarkMode = themeOverride ?? systemTheme === "dark";
+  const { isDarkMode, themeReady, changeTheme } = useWeatherTheme();
+  const {
+    city, setCity, lat, setLat, lon, setLon, units, changeUnits,
+    weather, forecast, loading, error, setError,
+    mapPosition, mapLocationName, selectMapLocation,
+    searchByCity, searchByCoordinates, searchCurrentLocation,
+  } = useWeather();
   const styles = useMemo(() => createWeatherStyles(isDarkMode, width <= 600), [isDarkMode, width]);
   const colors = weatherThemes[isDarkMode ? "dark" : "light"];
-  const [city, setCity] = useState("");
-  const [lat, setLat] = useState("");
-  const [lon, setLon] = useState("");
-  const [units, setUnits] = useState<Units>("metric");
   const [forecastDays, setForecastDays] = useState<3 | 5>(3);
   const [focusedField, setFocusedField] = useState<string | null>(null);
-  const [inputError, setInputError] = useState("");
-  const [notice, setNotice] = useState("");
-  const visibleError = inputError || error;
-  // Keep any supplied result's labels consistent with its data when a unit
-  // preference is changed before weather integration is available.
+  const visibleError = error;
+  const visibleForecast = selectForecastDays(forecast, forecastDays);
   const displayUnits = weather?.units ?? units;
   const temperatureUnit = displayUnits === "metric" ? "°C" : "°F";
   const windUnit = displayUnits === "metric" ? "m/s" : "mph";
 
-  const showSearchUnavailable = () => {
-    Keyboard.dismiss();
-    setInputError("");
-    setNotice("Weather search is not available yet.");
-  };
-
-  const searchByCity = () => {
-    if (loading) return;
-    setNotice("");
-    if (!city.trim()) { setInputError("Please enter a city."); return; }
-    showSearchUnavailable();
-  };
-
-  const searchByCoordinates = () => {
-    if (loading) return;
-    setNotice("");
-    // Validate native text inputs locally; the shared utilities move in step 4.
-    const latitude = Number(lat);
-    const longitude = Number(lon);
-    if (!lat.trim() || !lon.trim() || !Number.isFinite(latitude) || !Number.isFinite(longitude)
-      || latitude < -90 || latitude > 90 || longitude < -180 || longitude > 180) {
-      setInputError("Enter a latitude between -90 and 90 and a longitude between -180 and 180.");
-      return;
-    }
-    showSearchUnavailable();
-  };
-
   const openLink = (url: string) => {
-    Linking.openURL(url).catch(() => setInputError("Unable to open this link on your device."));
+    Linking.openURL(url).catch(() => setError("Unable to open this link on your device."));
   };
 
   return (
@@ -202,7 +139,7 @@ export default function WeatherScreen({
               <Text style={styles.subtitle}>Check the current weather anywhere in the world.</Text>
               <View style={styles.themeControl}>
                 <Text style={styles.themeLabel}>Dark mode</Text>
-                <Switch accessibilityLabel="Dark mode" value={isDarkMode} onValueChange={setThemeOverride} trackColor={{ true: colors.accent }} />
+                <Switch accessibilityLabel="Dark mode" value={isDarkMode} onValueChange={changeTheme} disabled={!themeReady} trackColor={{ true: colors.accent }} />
               </View>
             </View>
 
@@ -244,15 +181,16 @@ export default function WeatherScreen({
                 <WeatherButton title="Search coordinates" onPress={searchByCoordinates} styles={styles} style={styles.coordinateButton} disabled={loading} />
               </View>
 
-              {/* The native map and its dependency are deliberately deferred. */}
-              <View style={styles.mapPlaceholder}>
-                <Text style={styles.label}>Location map</Text>
-                <Text style={styles.placeholderText}>Map preview is not available yet.</Text>
+              <Text style={styles.placeholderText}>Tap the map to fill coordinates, then search.</Text>
+              <View style={styles.mapFrame}>
+                <LocationMap position={mapPosition} locationName={mapLocationName} onSelect={selectMapLocation} disabled={loading} dark={isDarkMode} />
               </View>
+              <WeatherButton title="Use my current location" onPress={searchCurrentLocation} styles={styles} disabled={loading} />
+              <Text style={styles.placeholderText}>Location access is requested only when you choose this option.</Text>
               <View style={styles.controls}>
                 <Text style={styles.label}>Units:</Text>
-                <WeatherButton title="Metric" onPress={() => setUnits("metric")} selected={units === "metric"} styles={styles} disabled={loading} />
-                <WeatherButton title="Imperial" onPress={() => setUnits("imperial")} selected={units === "imperial"} styles={styles} disabled={loading} />
+                <WeatherButton title="Metric" onPress={() => changeUnits("metric")} selected={units === "metric"} styles={styles} disabled={loading} />
+                <WeatherButton title="Imperial" onPress={() => changeUnits("imperial")} selected={units === "imperial"} styles={styles} disabled={loading} />
               </View>
             </View>
 
@@ -263,7 +201,6 @@ export default function WeatherScreen({
               </View>
             )}
             {Boolean(visibleError) && <Text accessibilityRole="alert" accessibilityLiveRegion="assertive" style={styles.error}>{visibleError}</Text>}
-            {Boolean(notice) && !visibleError && <Text accessibilityLiveRegion="polite" style={styles.message}>{notice}</Text>}
 
             {weather && !loading && (
               <FadeIn style={styles.weatherCard}>
@@ -295,7 +232,7 @@ export default function WeatherScreen({
                       </View>
                     </View>
                     <View style={styles.forecastGrid}>
-                      {forecast.slice(0, forecastDays).map((day, index) => (
+                      {visibleForecast.map((day, index) => (
                         <FadeIn key={day.date} style={styles.forecastDay} delay={index * 45}>
                           <Text style={styles.forecastDate}>{day.label}</Text>
                           {day.iconUrl && <Image source={{ uri: day.iconUrl }} accessibilityLabel={day.description} style={styles.forecastIcon} />}

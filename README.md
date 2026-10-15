@@ -4,7 +4,7 @@ A mobile adaptation of an existing React weather application, built with React N
 
 ## Project Status
 
-The project is being migrated from a React web application to a React Native mobile application.
+The native weather screen is connected to the OpenWeather API, the migrated forecast and location utilities, a native map, foreground geolocation, and persistent theme storage. Device testing is still required before release.
 
 ## Features
 
@@ -52,7 +52,7 @@ Geolocation uses Expo Location to check nearby weather without typing a city nam
 
    ```bash
    git clone https://github.com/KNors22/weather-mobile-app.git
-   cd weather-mobile-app/react-weather-app
+   cd weather-mobile-app
    ```
 
 2. Install the project dependencies:
@@ -67,7 +67,7 @@ Geolocation uses Expo Location to check nearby weather without typing a city nam
    cp .env.example .env
    ```
 
-   Set `EXPO_PUBLIC_OPENWEATHER_API_KEY` to your OpenWeatherMap API key.
+   Set `EXPO_PUBLIC_OPENWEATHER_API_KEY` to your OpenWeatherMap API key. Expo includes public environment variables in the application bundle, so this key is not a server-side secret. Restart Expo after changing configuration.
 
 4. Start the Expo development server:
 
@@ -79,7 +79,11 @@ Geolocation uses Expo Location to check nearby weather without typing a city nam
 
    Use `npm run android` or `npm run ios` to start Expo and open a configured emulator or simulator. On physical iOS devices, sign in to Expo CLI and Expo Go with the same account if prompted.
 
-The native map works in Expo Go. A standalone Android build also requires a Google Maps API key and native map configuration; see the [Expo map setup guide](https://docs.expo.dev/versions/latest/sdk/map-view/). iOS uses Apple Maps by default. Browser preview is not configured for this native application.
+The native map works in a compatible Expo Go version. For a standalone Android build, set `GOOGLE_MAPS_ANDROID_API_KEY` in your local or build environment. `app.config.ts` passes it to the native map config plugin. Enable the Maps SDK for Android and restrict the key to your app's Android package and signing certificate; see the [Expo map setup guide](https://docs.expo.dev/versions/v57.0.0/sdk/map-view/). Configure your own Android package and iOS bundle identifier before creating release builds. iOS uses Apple Maps by default.
+
+`npm run web` supports city and coordinate search with a map fallback; the interactive map is available on Android and iOS. Browser location access may require HTTPS or localhost and the browser's permission.
+
+The icon, adaptive-icon, splash, and favicon paths already configured in `app.json` still need their image files. Expo Doctor currently reports missing launcher-icon assets; add the artwork before creating release builds.
 
 ## Usage
 
@@ -95,33 +99,45 @@ Current repository contents:
 
 ```text
 weather-mobile-app/
-├── .env
+├── .env.example
 ├── .gitignore
 ├── app.json
+├── app.config.ts
 ├── CHANGELOG.md
 ├── LICENSE
 ├── README.md
 ├── package.json
 ├── package-lock.json
 ├── tsconfig.json
+├── eslint.config.js
 ├── assets/images/
-└── src/app/
-    └── index.tsx
+├── tests/
+└── src/
+    ├── app/              # Expo Router entry and layout
+    ├── screens/          # Native weather interface
+    ├── styles/           # Theme palettes and responsive native styles
+    ├── components/       # Native map and browser fallback
+    ├── hooks/            # Weather state and persistent theme
+    ├── services/         # OpenWeather requests and device location
+    ├── types/            # API and display types
+    └── utils/            # Coordinates, timezone formatting, and forecasts
 ```
 
 ## Development Notes
 
 - **Original project:** [React Weather App](https://github.com/KNors22/my-weather-app). City and coordinate lookup, current conditions, forecasts, units, themes, and local time are carried over.
-- **Entry point:** `main.jsx` uses Expo's `registerRootComponent` in place of React DOM's `createRoot`.
+- **Entry point:** `expo-router/entry` starts the application. `src/app/index.tsx` renders the weather screen, and `_layout.tsx` configures navigation.
 - **Native interface:** HTML and CSS are replaced with React Native components and `StyleSheet`. The screen scrolls, respects safe areas, accommodates the keyboard, and uses accessible labels and touch targets.
 - **Platform APIs:** Leaflet is replaced with React Native Maps, browser storage with AsyncStorage, and browser links with `Linking`. Weather icons are loaded remotely from OpenWeather.
 - **Request handling:** Weather actions are locked while a lookup is running. A failed refresh retains the previous result and its unit system.
-- **Testing:** `npm run lint` and `npm test` pass, and Metro exports for both Android and iOS have been verified. Eight tests cover API requests and failures, coordinate validation, daily forecasts, forecast duration, and timezone formatting. Before submission, test on a physical device or simulator and record results for GPS access, permission denial, map selection, theme persistence, keyboard behavior, and network failures.
+- **Failure handling:** Weather requests time out after 15 seconds and GPS lookup after 20 seconds. Denied location access leaves manual search available. Theme loading falls back to the system appearance if local storage is unavailable.
+- **Testing:** `npm test` runs 19 regression tests using Node's built-in test runner and TypeScript stripping. They cover API requests, errors and timeouts, coordinates, daily forecasts, timezone formatting, and location permission/service/GPS failures. A live city search and forecast have also been verified. Before submission, test on a physical device or simulator and record results for map selection, GPS access, permission prompts, theme persistence, keyboard behavior, and network failures.
 
-Run the checks from `react-weather-app/`:
+Run the checks from the project root:
 
 ```bash
 npm run lint
+npx tsc --noEmit
 npm test
 npx expo install --check
 npx expo export --platform android --platform ios

@@ -2,7 +2,7 @@
   "expo": {
     "name": "weather-mobile-app",
     "slug": "weather-mobile-app",
-    "version": "0.2.0",
+    "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "weathermobileapp",
@@ -31,6 +31,12 @@
           "backgroundColor": "#208AEF",
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 76
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Allow Weather Mobile App to use your location to show nearby weather."
         }
       ]
     ],

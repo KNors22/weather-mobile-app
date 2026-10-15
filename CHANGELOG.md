@@ -14,6 +14,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 * Document the weather API provider and exact configuration steps.
 
 
+## [1.0.0] 2026-10-15
+
+### Added
+* Connected city and coordinate searches to the OpenWeather API.
+* Migrated coordinate validation, forecast processing, and timezone formatting utilities.
+* Added interactive native map selection with a browser fallback.
+* Added device geolocation with permission handling and manual-search fallback.
+* Added persistent light and dark theme preferences using AsyncStorage.
+* Added request timeouts and error handling while preserving previous results on failed refreshes.
+* Updated Expo dependencies, location permissions, and optional Android Google Maps configuration.
+* Added regression tests and updated installation and development documentation.
+
+[Full Changelog](https://github.com/knors22/my-weather-app/compare/v0.2.0...v1.0.0)
+
+
 ## [0.2.0] 2026-10-15
 
 ### Added
@@ -21,7 +36,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 * Connected the home route to `screens/WeatherScreen.tsx`
 * Converted the interface to native components with input validation and a session-only theme toggle.
 * Translated CSS into responsive native styles in `styles/WeatherScreenStyles.ts`.
-
 
 [Full Changelog](https://github.com/knors22/my-weather-app/compare/v0.1.0...v0.2.0)
 

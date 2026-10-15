@@ -65,7 +65,7 @@ export function createWeatherStyles(dark: boolean, compact: boolean) {
     divider: { flexDirection: "row", alignItems: "center", gap: 12, marginVertical: 14 },
     dividerLine: { height: 1, backgroundColor: colors.softBorder, flex: 1 },
     dividerText: { color: colors.faint, fontSize: 13, fontWeight: "600" },
-    mapPlaceholder: { height: compact ? 230 : 280, justifyContent: "center", alignItems: "center", gap: 8, marginTop: 6, padding: 20, borderWidth: 1, borderColor: colors.border, borderRadius: 8, backgroundColor: colors.subtle },
+    mapFrame: { height: compact ? 230 : 280, overflow: "hidden", marginTop: 6, borderWidth: 1, borderColor: colors.border, borderRadius: 8, backgroundColor: colors.subtle },
     placeholderText: { color: colors.muted, fontSize: 14, lineHeight: 21, textAlign: "center" },
     controls: { flexDirection: "row", flexWrap: "wrap", alignItems: "center", gap: 8, marginTop: 14 },
     secondaryButton: { backgroundColor: colors.secondary, paddingHorizontal: 12 },
