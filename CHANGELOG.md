@@ -14,6 +14,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 * Document the weather API provider and exact configuration steps.
 
 
+## [0.2.0] 2026-10-15
+
+### Added
+* Migrated project to React Native and Expo, replacing the previous React web application using Codex.
+* Connected the home route to `screens/WeatherScreen.tsx`
+* Converted the interface to native components with input validation and a session-only theme toggle.
+* Translated CSS into responsive native styles in `styles/WeatherScreenStyles.ts`.
+
+
+[Full Changelog](https://github.com/knors22/my-weather-app/compare/v0.1.0...v0.2.0)
+
+
 ## [0.1.0] 2026-10-15
 
 ### Changed

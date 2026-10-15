@@ -1,7 +1,7 @@
 {
   "name": "weather-mobile-app",
   "main": "expo-router/entry",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "dependencies": {
     "@expo/ui": "~57.0.24",
     "expo": "~57.0.29",
@@ -39,7 +39,6 @@
     "web": "expo start --web",
     "lint": "expo lint",
     "version": "node scripts/sync-version.cjs"
-    
   },
   "private": true
 }
