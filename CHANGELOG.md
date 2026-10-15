@@ -14,6 +14,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 * Document the weather API provider and exact configuration steps.
 
 
+## [1.1.0] 2026-10-15
+
+### Added
+* Added regression tests to check application's logic using simulated API responses and device behavior.
+
+[Full Changelog](https://github.com/knors22/my-weather-app/compare/v1.0.0...v1.1.0)
+
+
 ## [1.0.0] 2026-10-15
 
 ### Added
@@ -24,7 +32,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 * Added persistent light and dark theme preferences using AsyncStorage.
 * Added request timeouts and error handling while preserving previous results on failed refreshes.
 * Updated Expo dependencies, location permissions, and optional Android Google Maps configuration.
-* Added regression tests and updated installation and development documentation.
+* Updated installation and development documentation.
 
 [Full Changelog](https://github.com/knors22/my-weather-app/compare/v0.2.0...v1.0.0)
 
@@ -60,4 +68,4 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 ## [0.0.1] 2026-10-14
 
 ### Added
-* Initial commit with LICENSE and README file
+* Initial commit with LICENSE and README file.
