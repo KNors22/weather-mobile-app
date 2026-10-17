@@ -6,12 +6,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 ## [Unreleased]
 
+
+## [1.2.1] 2026-10-17
+
 ### Added
-* Complete React Native and Expo application source.
-* Required assets, dependency manifests, lockfile, and configuration files.
-* Weather lookup features.
-* Geolocation with permission handling and a manual-search fallback.
-* Document the weather API provider and exact configuration steps.
+* Update icon, adaptive-icon, splash screen, favicon in app.json configuration.
+
+### Fixed
+* Replace empty icon in the footer and weather card with Lucide icons.
+
+[Full Changelog](https://github.com/knors22/my-weather-app/compare/v1.1.1...v1.2.1)
 
 
 ## [1.1.1] 2026-10-15

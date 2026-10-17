@@ -38,7 +38,7 @@ export const weatherThemes = {
   },
 };
 
-export function createWeatherStyles(dark: boolean, compact: boolean) {
+export function createWeatherStyles(dark: boolean, compact: boolean, fontScale = 1) {
   const colors = weatherThemes[dark ? "dark" : "light"];
 
   return StyleSheet.create({
@@ -84,9 +84,20 @@ export function createWeatherStyles(dark: boolean, compact: boolean) {
     weatherIcon: { width: compact ? 64 : 90, height: compact ? 64 : 90 },
     temperature: { color: colors.text, fontSize: compact ? 56 : 72, fontWeight: "700", marginTop: 15 },
     feelsLike: { color: colors.muted, fontSize: 15, marginTop: 8 },
-    details: { flexDirection: "row", flexWrap: "wrap", gap: 12, marginTop: 30 },
-    detail: { flexBasis: compact ? "100%" : "47%", flexGrow: 1, flexDirection: "row", alignItems: "center", gap: 12, padding: 16, backgroundColor: colors.subtle, borderRadius: 12 },
-    detailIcon: { fontSize: 24 },
+    details: { flexDirection: "row", flexWrap: "wrap", gap: 12, marginTop: 24 },
+    detail: {
+      // Keep two columns when the content fits; allow narrow screens and larger text to stack.
+      flexBasis: compact && fontScale > 1.2 ? "100%" : "47%",
+      minWidth: 136,
+      flexGrow: 1,
+      flexDirection: "row",
+      alignItems: "center",
+      gap: compact ? 8 : 12,
+      padding: compact ? 12 : 16,
+      backgroundColor: colors.subtle,
+      borderRadius: 12,
+    },
+    detailIcon: { color: colors.strong, width: 28, textAlign: "center", flexShrink: 0 },
     detailContent: { flex: 1, gap: 3 },
     detailLabel: { color: colors.muted, fontSize: 13 },
     detailValue: { color: colors.text, fontSize: 16, fontWeight: "700" },
@@ -104,7 +115,7 @@ export function createWeatherStyles(dark: boolean, compact: boolean) {
     forecastTemperatureLabel: { color: colors.muted, fontSize: 12 },
     forecastTemperatureValue: { color: colors.text, fontSize: 14, fontWeight: "700" },
     emptyState: { alignItems: "center", gap: 12, marginTop: 50 },
-    emptyIcon: { fontSize: 64 },
+    emptyIcon: { width: 64, height: 64 },
     emptyHeading: { color: colors.strong, fontSize: 22, fontWeight: "700", textAlign: "center" },
     footer: { flexDirection: compact ? "column" : "row", alignItems: compact ? "flex-start" : "center", justifyContent: "space-between", gap: compact ? 12 : 20, marginTop: compact ? 32 : 42, paddingTop: 18, borderTopWidth: 1, borderTopColor: colors.softBorder },
     copyright: { color: colors.muted, fontSize: 13 },

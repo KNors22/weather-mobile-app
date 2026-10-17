@@ -1,4 +1,5 @@
 import { type ReactNode, useEffect, useMemo, useState } from "react";
+import { Lucide, type LucideIconName } from "@react-native-vector-icons/lucide";
 import {
   AccessibilityInfo,
   ActivityIndicator,
@@ -91,11 +92,11 @@ function WeatherButton({ title, onPress, styles, disabled = false, selected, sty
 }
 
 function WeatherDetail({ icon, label, value, styles }: {
-  icon: string; label: string; value: string; styles: WeatherStyles;
+  icon: LucideIconName; label: string; value: string; styles: WeatherStyles;
 }) {
   return (
     <View style={styles.detail}>
-      <Text accessibilityElementsHidden importantForAccessibility="no" style={styles.detailIcon}>{icon}</Text>
+      <Lucide name={icon} size={24} accessible={false} aria-hidden accessibilityElementsHidden importantForAccessibility="no" style={styles.detailIcon} />
       <View style={styles.detailContent}>
         <Text style={styles.detailLabel}>{label}</Text>
         <Text style={styles.detailValue}>{value}</Text>
@@ -105,7 +106,7 @@ function WeatherDetail({ icon, label, value, styles }: {
 }
 
 export default function WeatherScreen() {
-  const { width } = useWindowDimensions();
+  const { width, fontScale } = useWindowDimensions();
   const { isDarkMode, themeReady, changeTheme } = useWeatherTheme();
   const {
     city, setCity, lat, setLat, lon, setLon, units, changeUnits,
@@ -113,7 +114,7 @@ export default function WeatherScreen() {
     mapPosition, mapLocationName, selectMapLocation,
     searchByCity, searchByCoordinates, searchCurrentLocation,
   } = useWeather();
-  const styles = useMemo(() => createWeatherStyles(isDarkMode, width <= 600), [isDarkMode, width]);
+  const styles = useMemo(() => createWeatherStyles(isDarkMode, width <= 600, fontScale), [isDarkMode, width, fontScale]);
   const colors = weatherThemes[isDarkMode ? "dark" : "light"];
   const [forecastDays, setForecastDays] = useState<3 | 5>(3);
   const [focusedField, setFocusedField] = useState<string | null>(null);
@@ -214,10 +215,10 @@ export default function WeatherScreen() {
                 <Text style={styles.temperature}>{Math.round(weather.temperature)}{temperatureUnit}</Text>
                 <Text style={styles.feelsLike}>Feels like {Math.round(weather.feelsLike)}{temperatureUnit}</Text>
                 <View style={styles.details}>
-                  <WeatherDetail icon="💧" label="Humidity" value={`${weather.humidity}%`} styles={styles} />
-                  <WeatherDetail icon="💨" label="Wind" value={`${Math.round(weather.windSpeed)} ${windUnit}`} styles={styles} />
-                  <WeatherDetail icon="🌡️" label="Pressure" value={`${weather.pressure} hPa`} styles={styles} />
-                  <WeatherDetail icon="👁️" label="Visibility" value={`${weather.visibilityKm.toFixed(1)} km`} styles={styles} />
+                  <WeatherDetail icon="droplet" label="Humidity" value={`${weather.humidity}%`} styles={styles} />
+                  <WeatherDetail icon="wind" label="Wind" value={`${Math.round(weather.windSpeed)} ${windUnit}`} styles={styles} />
+                  <WeatherDetail icon="gauge" label="Pressure" value={`${weather.pressure} hPa`} styles={styles} />
+                  <WeatherDetail icon="eye" label="Visibility" value={`${weather.visibilityKm.toFixed(1)} km`} styles={styles} />
                 </View>
 
                 {forecast.length > 0 && (
@@ -256,7 +257,10 @@ export default function WeatherScreen() {
 
             {!weather && !loading && !visibleError && (
               <View style={styles.emptyState}>
-                <Text accessibilityElementsHidden importantForAccessibility="no" style={styles.emptyIcon}>🌤️</Text>
+                <View accessible={false} aria-hidden accessibilityElementsHidden importantForAccessibility="no-hide-descendants" style={styles.emptyIcon}>
+                  {/* Mount after hydration so the icon font loads consistently on web. */}
+                  {themeReady && <Lucide name="cloud-sun" size={64} color={colors.strong} />}
+                </View>
                 <Text accessibilityRole="header" style={styles.emptyHeading}>Search for a location</Text>
                 <Text style={styles.placeholderText}>Enter a city or coordinates to see the current weather.</Text>
               </View>
